@@ -10,10 +10,10 @@ if not os.path.exists("release"): os.mkdir("release")
 if not os.path.exists("snapshot"): os.mkdir("snapshot")
 for x in manifest["versions"]:
     if not os.path.exists(x["type"]+"/"+x["id"]+"/client.txt"):
-        vManifest = requests.get(x["url"]).json()
         try:
-            os.makedirs(x["type"]+"/"+x["id"])
+            vManifest = requests.get(x["url"]).json()
             print(x["type"], x["id"], "->", vManifest["downloads"]["client_mappings"]["url"])
+            os.makedirs(x["type"]+"/"+x["id"])
             if "client_mappings" in vManifest["downloads"]:
                 f = open(x["type"]+"/"+x["id"]+"/client.txt", "wb")
                 f.write(requests.get(vManifest["downloads"]["client_mappings"]["url"]).content)
@@ -26,8 +26,12 @@ for x in manifest["versions"]:
         except: 1
 
 for root, dirs, files in os.walk("."):
-    for x in files:
-        f = open(os.path.join(root, x), "r")
-        if (f.read().strip() == ""):
-            f.close()
-            os.remove(os.path.join(root, x))
+    for x in dirs:
+        if len(os.listdir(os.path.join(root, x))) == 0 and not os.path.join(root, x).__contains__(".git"):
+            os.rmdir(os.path.join(root, x))
+    # for x in files:
+        # f = open(os.path.join(root, x), "r")
+        # print(x)
+        # if (f.read().strip() == ""):
+            # f.close()
+            # os.remove(os.path.join(root, x))
